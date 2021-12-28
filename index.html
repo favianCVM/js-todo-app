@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>JS TODO</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <style>
+      .w-fit-content {
+        width: fit-content;
+      }
+
+    </style>
+  </head>
+  <body
+    class="flex flex-col items-center justify-center min-h-screen w-full bg-blue-300"
+  >
+    <h1
+      class="
+        bg-pink-500
+        w-full
+        text-center text-white text-2xl
+        font-bold
+        rounded-2xl
+        py-8
+        shadow-xl
+        w-4/12 
+        mb-12
+      "
+    >
+      CLOUD ACADEMY JS TODO
+    </h1>
+
+    <div class="grid grid-flow-col w-8/12 grid-cols-2 mx-auto">
+      <div class=" bg-gray-300 border-1 border-black rounded-lg px-4 py-8">
+        <ul id="todo-list" class="grid gap-y-6">
+          
+        </ul>
+      </div>
+      <div class="flex flex-col items-center">
+        <form id="todoForm"> 
+          <input type="text" class="p-2 rounded-md border-gray-400 border-2" id="todoTitle" placeholder="Todo title...">
+          <button type="submit" class="bg-green-500 p-2 rounded-lg mt-3">Add</span>
+        </form>
+        <button onclick="deleteAllTodos()" class="p-2 bg-red-500 rounded-lg mt-5">Delete All</span>
+      </div>
+    </div>
+  
+    <script>
+      const newTodo = () => {
+        let json_temp = JSON.parse( localStorage.getItem('json_data') );
+        let title = $("#todoTitle").val()
+
+        if(!title) return alert("Put some text below")
+  
+        let todo = {
+          title: title,
+          id: json_temp.length
+        }
+  
+        json_temp.push(todo)
+  
+        localStorage.setItem("json_data", JSON.stringify(json_temp))
+        $("#todoTitle").val("")
+        displayTodo(todo)
+      }
+  
+      const displayTodo = ({id, title}) => {
+        let element = `
+            <li style="display:none" data-id="${id}" > 
+              ${title} 
+              <button onclick="deleteTodo(${id})" class="p-1 ml-2 bg-red-500 rounded-lg delete">Delete</button>
+            </li> `
+          $("#todo-list").append(element);
+          // $("li[data-id="+todoID+"]").fadeIn();
+          $(`li[data-id=${id}]`).fadeIn();
+      }
+  
+      const initAndEventListeners = () => {
+        let json_data;
+        
+        if(!localStorage.getItem('json_data')){
+          localStorage.setItem("json_data", JSON.stringify([]))
+        } else {
+          json_data = JSON.parse( localStorage.getItem('json_data') );
+  
+          json_data.forEach(el => displayTodo(el))
+        }
+        
+        $("#todoForm").on("submit", (e) => {
+          e.preventDefault()
+          newTodo()
+        })
+      }
+  
+      const deleteTodo = (id) => {
+        $(`li[data-id=${id}]`).slideUp();
+        let json_temp = JSON.parse( localStorage.getItem('json_data') );
+        
+        json_temp.splice(json_temp.findIndex(el => el.id === id), 1)
+        
+        localStorage.setItem('json_data', 
+          JSON.stringify(json_temp)
+        );
+      }
+  
+  
+      const deleteAllTodos = () => {
+        if (confirm("Are you sure you want to delete all of your Todos?")) {
+          localStorage.setItem('json_data', JSON.stringify([]));
+          $("#todo-list").empty();
+        }
+      }
+  
+      initAndEventListeners();
+  
+    </script>
+  </body>
+</html>
